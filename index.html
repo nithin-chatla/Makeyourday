@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShareTheJoy - Professional Donation Website</title>
+
+    <!-- Tailwind CSS & Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    
+    <!-- GSAP Animation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #fdfcfa;
+            color: #374151; /* gray-700 */
+        }
+        html { scroll-behavior: smooth; }
+        .gold-text { color: #D4AF37; }
+        
+        /* Input focus style */
+        input:focus, textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #bfdbfe; /* blue-200 */
+            border-color: #60a5fa; /* blue-400 */
+        }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed; inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 1000; opacity: 0; visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-backdrop.visible { opacity: 1; visibility: visible; }
+        .modal-content {
+            background-color: white; padding: 2rem;
+            border-radius: 1rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center; max-width: 90%; width: 400px;
+            transform: scale(0.9); transition: transform 0.3s ease;
+        }
+        .modal-backdrop.visible .modal-content { transform: scale(1); }
+    </style>
+</head>
+<body>
+
+    <!-- App Shell: Header, Main Content, Footer -->
+    <div id="app-shell">
+        <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-40">
+            <div class="container mx-auto flex justify-between items-center p-4">
+                <a href="#" data-page="home" class="nav-link flex items-center gap-2 text-2xl font-bold gold-text">
+                    <svg class="h-8 w-8 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    <span>ShareTheJoy</span>
+                </a>
+                <nav class="hidden md:flex space-x-6 items-center text-gray-700">
+                    <a href="#" data-page="home" class="nav-link hover:text-blue-600 transition-colors">Home</a>
+                    <a href="#" data-page="donors" class="nav-link hover:text-blue-600 transition-colors">Our Donors</a>
+                    <a href="#" data-page="gallery" class="nav-link hover:text-blue-600 transition-colors">Gallery</a>
+                    <a href="#" data-page="about" class="nav-link hover:text-blue-600 transition-colors">About Us</a>
+                    <a href="#" data-page="contact" class="nav-link bg-blue-600 text-white px-4 py-2 rounded-full font-semibold shadow-md hover:bg-blue-700">Contact</a>
+                </nav>
+                <button id="mobile-menu-button" class="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-200">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+            <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+                <a href="#" data-page="home" class="nav-link block py-3 px-4 hover:bg-gray-100">Home</a>
+                <a href="#" data-page="donors" class="nav-link block py-3 px-4 hover:bg-gray-100">Our Donors</a>
+                <a href="#" data-page="gallery" class="nav-link block py-3 px-4 hover:bg-gray-100">Gallery</a>
+                <a href="#" data-page="about" class="nav-link block py-3 px-4 hover:bg-gray-100">About Us</a>
+                <a href="#" data-page="contact" class="nav-link block py-3 px-4 hover:bg-gray-100">Contact</a>
+            </div>
+        </header>
+
+        <main id="main-content"></main>
+
+        <footer class="bg-gray-800 text-gray-300">
+            <div class="container mx-auto py-12 px-4 text-center">
+                <h3 class="text-2xl font-bold gold-text">ShareTheJoy</h3>
+                <p class="mt-4">Making the world a better place, one smile at a time.</p>
+                <div class="flex justify-center space-x-6 mt-6">
+                    <a href="#" class="hover:text-white transition-colors"><i class="fab fa-facebook-f text-2xl"></i></a>
+                    <a href="#" class="hover:text-white transition-colors"><i class="fab fa-twitter text-2xl"></i></a>
+                    <a href="#" class="hover:text-white transition-colors"><i class="fab fa-instagram text-2xl"></i></a>
+                </div>
+                <div class="mt-8 border-t border-gray-700 pt-6">
+                    <a href="#" data-page="admin" class="nav-link text-sm text-gray-400 hover:text-white">Admin Panel</a>
+                </div>
+                <p class="mt-6 text-sm">&copy; 2025 ShareTheJoy. All Rights Reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modal Container -->
+    <div id="custom-modal" class="modal-backdrop">
+        <div class="modal-content">
+            <p id="modal-message" class="text-lg mb-6"></p>
+            <button id="modal-close-button" class="bg-blue-600 text-white font-semibold px-6 py-2 rounded-full hover:bg-blue-700 transition-colors">Close</button>
+        </div>
+    </div>
+
+    <!-- Page Templates -->
+    <template id="template-home">
+        <!-- Hero Section -->
+        <section class="hero-section bg-gradient-to-br from-blue-50 to-yellow-50 relative overflow-hidden">
+            <div class="container mx-auto flex flex-col md:flex-row items-center justify-between py-20 md:py-32 px-4 text-center md:text-left">
+                <div class="md:w-1/2 z-10">
+                    <h1 class="hero-title text-4xl md:text-6xl font-extrabold text-gray-800 leading-tight">
+                        💖 Make Someone <span class="gold-text">Smile</span> Today
+                    </h1>
+                    <p class="hero-p mt-6 text-lg md:text-xl max-w-xl mx-auto md:mx-0 text-gray-600">
+                        Your small contribution on your special day can bring immense joy to a child in need. Let's spread happiness together.
+                    </p>
+                    <div class="mt-10 hero-btn">
+                        <a href="#donate-form-section" class="bg-[#D4AF37] text-white text-lg font-semibold px-8 py-4 rounded-full shadow-lg hover:scale-105 transform transition-transform inline-block">
+                            Donate Now <i class="fas fa-heart ml-2"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="md:w-1/2 mt-12 md:mt-0 z-10 hero-img">
+                    <img src="https://postimg.cc/tZsWK3W3" alt="Children being served food" class="rounded-2xl shadow-2xl w-full" />
+                </div>
+            </div>
+            <div class="floating-icons absolute top-0 left-0 w-full h-full"></div>
+        </section>
+        <!-- Donation Form Section -->
+        <section id="donate-form-section" class="py-20"></section>
+        <!-- Sponsor a Child Section -->
+        <section class="py-20 bg-blue-50">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800">🧒 Sponsor a Child's Future</h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
+                    We believe every child deserves a chance to succeed. Through our Child Sponsorship program, your donations provide children with education, healthcare, and a safe environment to grow.
+                </p>
+                <div class="mt-8">
+                    <a href="#" data-page="about" class="nav-link bg-blue-600 text-white font-semibold px-8 py-3 rounded-full hover:bg-blue-700 transition-colors">
+                        Learn More About Our Mission
+                    </a>
+                </div>
+            </div>
+        </section>
+        <!-- Photo Gallery Preview Section -->
+        <section id="gallery-preview-section" class="py-20 bg-gray-100"></section>
+    </template>
+
+    <template id="template-donors">
+        <div class="py-20 bg-gray-50 min-h-screen">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-16">
+                    <h1 class="text-4xl md:text-5xl font-bold text-gray-800">Our Wall of Heroes</h1>
+                    <p class="mt-4 text-lg text-gray-600">A heartfelt thank you to every single person who has contributed to our cause.</p>
+                </div>
+                <div id="donors-list-container" class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8">
+                    <!-- Donors list will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </template>
+    
+    <template id="template-gallery">
+        <div class="py-20 bg-white min-h-screen">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-16">
+                    <h1 class="text-4xl md:text-5xl font-bold text-gray-800">Our Gallery</h1>
+                    <p class="mt-4 text-lg text-gray-600">Moments of joy and hope, made possible by you.</p>
+                </div>
+                <div id="gallery-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <!-- Gallery images will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="template-about">
+        <div class="py-20 bg-white">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-16">
+                    <h1 class="text-4xl md:text-5xl font-bold text-gray-800">Our Mission & Vision</h1>
+                    <p class="mt-4 text-lg text-gray-600">Learn more about who we are and what we do.</p>
+                </div>
+                <div class="flex flex-col md:flex-row items-center gap-12 md:gap-16">
+                    <div class="w-full md:w-1/2">
+                        <img src="https://placehold.co/600x400/3B82F6/FFFFFF?text=Our+Team" alt="Our Team" class="rounded-lg shadow-xl w-full h-auto" />
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-4">Driven by Compassion</h2>
+                        <p class="text-gray-600 mb-4">
+                            ShareTheJoy was founded on a simple yet powerful idea: that collective kindness can create profound change. We are a dedicated team of volunteers, social workers, and community leaders committed to uplifting underprivileged children and individuals.
+                        </p>
+                        <p class="text-gray-600">
+                            Our mission is to ensure that no child goes hungry and every child has access to quality education. We create transparent, impactful programs that connect generous donors with those who need it most.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="template-contact">
+        <div class="py-20 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-16">
+                    <h1 class="text-4xl md:text-5xl font-bold text-gray-800">Get In Touch</h1>
+                    <p class="mt-4 text-lg text-gray-600">We'd love to hear from you. Send us a message below.</p>
+                </div>
+                <div class="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-lg">
+                    <form id="contact-form" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="contact-name" class="block text-left text-sm font-medium text-gray-700 mb-1">Your Name</label>
+                                <input type="text" id="contact-name" placeholder="John Doe" class="p-3 border rounded-lg w-full transition" required />
+                            </div>
+                            <div>
+                                <label for="contact-email" class="block text-left text-sm font-medium text-gray-700 mb-1">Your Email</label>
+                                <input type="email" id="contact-email" placeholder="john.doe@example.com" class="p-3 border rounded-lg w-full transition" required />
+                            </div>
+                        </div>
+                        <div>
+                            <label for="contact-subject" class="block text-left text-sm font-medium text-gray-700 mb-1">Subject</label>
+                            <input type="text" id="contact-subject" placeholder="Question about donations" class="p-3 border rounded-lg w-full transition" required />
+                        </div>
+                        <div>
+                            <label for="contact-message" class="block text-left text-sm font-medium text-gray-700 mb-1">Message</label>
+                            <textarea id="contact-message" placeholder="Your message here..." class="p-3 border rounded-lg w-full h-32 transition" required></textarea>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="bg-blue-600 text-white text-lg font-semibold px-10 py-3 rounded-full shadow-lg w-full hover:bg-blue-700 transition-colors disabled:bg-gray-400">
+                                Send Message
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="template-admin">
+        <div class="py-20 bg-gray-100 min-h-screen">
+            <div id="admin-view-container">
+                <!-- Admin Login or Dashboard will be rendered here -->
+            </div>
+        </div>
+    </template>
+
+
+    <!-- Scripts -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- App State & Elements ---
+        const mainContent = document.getElementById('main-content');
+        let db, auth;
+        const ALLOWED_ADMIN_EMAILS = ['admin@example.com', 'your-email@gmail.com']; // <-- IMPORTANT: Add your admin emails here
+
+        // --- Modal Logic ---
+        const modal = document.getElementById('custom-modal');
+        const modalMessage = document.getElementById('modal-message');
+        const modalCloseButton = document.getElementById('modal-close-button');
+        const showModal = (message) => {
+            modalMessage.textContent = message;
+            modal.classList.add('visible');
+        };
+        const hideModal = () => modal.classList.remove('visible');
+        modalCloseButton.addEventListener('click', hideModal);
+        modal.addEventListener('click', (e) => e.target === modal && hideModal());
+
+        // --- Reusable Component Renderers ---
+        const renderDonationForm = (container) => {
+            container.innerHTML = `
+                <div class="container mx-auto px-4">
+                    <div class="text-center mb-16">
+                        <h2 class="text-3xl md:text-4xl font-bold text-gray-800">🎂 Donate on Your Special Day</h2>
+                        <p class="mt-4 text-lg text-gray-600">Celebrate your birthday, anniversary, or any special occasion by giving back.</p>
+                    </div>
+                    <div class="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-lg">
+                        <form id="donation-form" class="space-y-6">
+                            <div>
+                                <label class="block text-left text-sm font-medium text-gray-700 mb-2">Choose an amount (INR)</label>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                    <button type="button" class="amount-preset p-3 border rounded-lg hover:bg-blue-100 hover:border-blue-400 transition" data-amount="500">₹500</button>
+                                    <button type="button" class="amount-preset p-3 border rounded-lg hover:bg-blue-100 hover:border-blue-400 transition" data-amount="1000">₹1000</button>
+                                    <button type="button" class="amount-preset p-3 border rounded-lg hover:bg-blue-100 hover:border-blue-400 transition" data-amount="2500">₹2500</button>
+                                    <button type="button" class="amount-preset p-3 border rounded-lg hover:bg-blue-100 hover:border-blue-400 transition" data-amount="5000">₹5000</button>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="amount" class="block text-left text-sm font-medium text-gray-700 mb-1">Or enter a custom amount</label>
+                                <input type="number" name="amount" id="amount" placeholder="Custom Amount (INR)" class="p-3 border rounded-lg w-full transition" required />
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="name" class="block text-left text-sm font-medium text-gray-700 mb-1">Your Name</label>
+                                    <input type="text" name="name" id="name" placeholder="John Doe" class="p-3 border rounded-lg w-full transition" required />
+                                </div>
+                                <div>
+                                    <label for="email" class="block text-left text-sm font-medium text-gray-700 mb-1">Your Email</label>
+                                    <input type="email" name="email" id="email" placeholder="john.doe@example.com" class="p-3 border rounded-lg w-full transition" required />
+                                </div>
+                                <div>
+                                    <label for="phone" class="block text-left text-sm font-medium text-gray-700 mb-1">Phone (Optional)</label>
+                                    <input type="tel" name="phone" id="phone" class="p-3 border rounded-lg w-full transition" />
+                                </div>
+                                <div>
+                                    <label for="location" class="block text-left text-sm font-medium text-gray-700 mb-1">Location</label>
+                                    <input type="text" name="location" id="location" placeholder="City, Country" class="p-3 border rounded-lg w-full transition" required />
+                                </div>
+                            </div>
+                            <div>
+                                <label for="note" class="block text-left text-sm font-medium text-gray-700 mb-1">Special Note (Optional)</label>
+                                <textarea name="note" id="note" placeholder="e.g., 'In memory of...'" class="p-3 border rounded-lg w-full h-24 transition"></textarea>
+                            </div>
+                            <div class="text-center pt-4">
+                                <button type="submit" class="bg-blue-600 text-white text-lg font-semibold px-10 py-4 rounded-full shadow-lg w-full hover:bg-blue-700 transition-colors disabled:bg-gray-400">
+                                    Proceed to Pay
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+            const form = container.querySelector('#donation-form');
+            form.addEventListener('submit', handleDonationSubmit);
+            form.querySelectorAll('.amount-preset').forEach(button => {
+                button.addEventListener('click', () => {
+                    form.amount.value = button.dataset.amount;
+                });
+            });
+        };
+
+        const renderGalleryPreview = (container) => {
+             const galleryImages = [
+                'https://placehold.co/400x400/e0f7fa/333?text=Event+1', 'https://placehold.co/400x400/fffde7/333?text=Event+2',
+                'https://placehold.co/400x400/e0f2fe/333?text=Event+3', 'https://placehold.co/400x400/fae8ff/333?text=Event+4',
+            ];
+            container.innerHTML = `
+                <div class="container mx-auto px-4">
+                    <div class="text-center mb-16">
+                        <h2 class="text-3xl md:text-4xl font-bold text-gray-800">🍱 Food for Every Soul</h2>
+                        <p class="mt-4 text-lg text-gray-600">Moments from our food distribution events.</p>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        ${galleryImages.map(src => `<img src="${src}" class="rounded-lg shadow-md w-full h-full object-cover" />`).join('')}
+                    </div>
+                    <div class="text-center mt-12">
+                        <a href="#" data-page="gallery" class="nav-link bg-blue-600 text-white font-semibold px-8 py-3 rounded-full hover:bg-blue-700 transition-colors">
+                            View Full Gallery
+                        </a>
+                    </div>
+                </div>
+            `;
+            container.querySelector('.nav-link').addEventListener('click', handleNavClick);
+        };
+
+        // --- Page Render Functions ---
+        const pages = {
+            home: () => {
+                const template = document.getElementById('template-home');
+                mainContent.innerHTML = '';
+                mainContent.appendChild(template.content.cloneNode(true));
+                renderDonationForm(mainContent.querySelector('#donate-form-section'));
+                renderGalleryPreview(mainContent.querySelector('#gallery-preview-section'));
+                
+                mainContent.querySelectorAll('.nav-link').forEach(link => link.addEventListener('click', handleNavClick));
+
+                // GSAP Animations for Home Page
+                gsap.from('.hero-title', { duration: 1, x: -50, opacity: 0, ease: 'power3.out', delay: 0.2 });
+                gsap.from('.hero-p', { duration: 1, x: -50, opacity: 0, ease: 'power3.out', delay: 0.4 });
+                gsap.from('.hero-btn', { duration: 1, scale: 0.5, opacity: 0, ease: 'elastic.out(1, 0.5)', delay: 0.6 });
+                gsap.from('.hero-img', { duration: 1.2, y: 50, opacity: 0, ease: 'power3.out', delay: 0.2 });
+                
+                const iconsContainer = mainContent.querySelector('.floating-icons');
+                iconsContainer.innerHTML = ''; // Clear previous icons
+                const icons = ['fa-heart', 'fa-gift', 'fa-star', 'fa-smile'];
+                for (let i = 0; i < 20; i++) {
+                    const iconEl = document.createElement('i');
+                    const iconClass = icons[Math.floor(Math.random() * icons.length)];
+                    iconEl.className = `fas ${iconClass} absolute text-blue-300 opacity-50`;
+                    iconEl.style.left = `${Math.random() * 100}%`;
+                    iconEl.style.fontSize = `${Math.random() * 20 + 10}px`;
+                    iconsContainer.appendChild(iconEl);
+                    gsap.to(iconEl, {
+                        y: '100vh', x: `${Math.random() * 200 - 100}px`,
+                        duration: Math.random() * 15 + 10, repeat: -1, ease: 'none', delay: Math.random() * 5
+                    });
+                }
+            },
+            donors: () => {
+                const template = document.getElementById('template-donors');
+                mainContent.innerHTML = '';
+                mainContent.appendChild(template.content.cloneNode(true));
+                const container = mainContent.querySelector('#donors-list-container');
+                container.innerHTML = `<p class="text-center text-gray-500">Loading donors...</p>`;
+                
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                const donationsCollectionPath = `/artifacts/${appId}/public/data/donations`;
+                const q = query(collection(db, donationsCollectionPath));
+
+                onSnapshot(q, (snapshot) => {
+                    if (snapshot.empty) {
+                        container.innerHTML = `<p class="text-center text-gray-500">No donations yet. Be the first!</p>`;
+                        return;
+                    }
+                    const sortedDocs = snapshot.docs.sort((a, b) => b.data().timestamp - a.data().timestamp);
+                    container.innerHTML = `<div class="space-y-4">${sortedDocs.map(doc => {
+                        const donor = doc.data();
+                        const date = donor.timestamp ? new Date(donor.timestamp.toDate()).toLocaleDateString() : 'N/A';
+                        const initials = donor.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                        const imageSrc = `https://placehold.co/48x48/E0E7FF/3730A3?text=${initials}`;
+                        
+                        return `
+                            <div class="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
+                                <div class="flex items-center gap-4">
+                                    <img src="${imageSrc}" alt="${donor.name}" class="w-12 h-12 rounded-full" />
+                                    <div>
+                                        <p class="font-semibold text-gray-800">${donor.name}</p>
+                                        <p class="text-sm text-gray-500">${donor.location}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold text-lg gold-text">₹${donor.amount}</p>
+                                    <p class="text-xs text-gray-400">${date}</p>
+                                </div>
+                            </div>`;
+                    }).join('')}</div>`;
+                }, (error) => {
+                    console.error("Error fetching donors:", error);
+                    container.innerHTML = `<p class="text-center text-red-500">Could not load donors list. Please check permissions.</p>`;
+                });
+            },
+            gallery: () => {
+                const template = document.getElementById('template-gallery');
+                mainContent.innerHTML = '';
+                mainContent.appendChild(template.content.cloneNode(true));
+                const galleryGrid = mainContent.querySelector('#gallery-grid');
+                const allImages = [
+                    'https://placehold.co/400x400/e0f7fa/333?text=Event+1', 'https://placehold.co/400x400/fffde7/333?text=Event+2',
+                    'https://placehold.co/400x400/e0f2fe/333?text=Event+3', 'https://placehold.co/400x400/fae8ff/333?text=Event+4',
+                    'https://placehold.co/400x400/f0fdf4/333?text=Event+5', 'https://placehold.co/400x400/fefce8/333?text=Event+6',
+                    'https://placehold.co/400x400/f0f9ff/333?text=Event+7', 'https://placehold.co/400x400/fdf2f8/333?text=Event+8',
+                    'https://placehold.co/400x400/ecfdf5/333?text=Event+9', 'https://placehold.co/400x400/fef9c3/333?text=Event+10',
+                    'https://placehold.co/400x400/eef2ff/333?text=Event+11', 'https://placehold.co/400x400/fce7f3/333?text=Event+12',
+                ];
+                galleryGrid.innerHTML = allImages.map(src => `<img src="${src}" class="rounded-lg shadow-md w-full h-full object-cover hover:scale-105 transform transition-transform duration-300 cursor-pointer" />`).join('');
+            },
+            about: () => {
+                const template = document.getElementById('template-about');
+                mainContent.innerHTML = '';
+                mainContent.appendChild(template.content.cloneNode(true));
+            },
+            contact: () => {
+                const template = document.getElementById('template-contact');
+                mainContent.innerHTML = '';
+                mainContent.appendChild(template.content.cloneNode(true));
+                const form = mainContent.querySelector('#contact-form');
+                const button = form.querySelector('button[type="submit"]');
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    button.disabled = true;
+                    button.textContent = 'Sending...';
+                    setTimeout(() => {
+                        showModal("Thank you for your message! We will get back to you shortly.");
+                        e.target.reset();
+                        button.disabled = false;
+                        button.textContent = 'Send Message';
+                    }, 1000);
+                });
+            },
+            admin: () => {
+                const template = document.getElementById('template-admin');
+                mainContent.innerHTML = '';
+                mainContent.appendChild(template.content.cloneNode(true));
+                const container = mainContent.querySelector('#admin-view-container');
+                
+                onAuthStateChanged(auth, user => {
+                    if (user && !user.isAnonymous && ALLOWED_ADMIN_EMAILS.includes(user.email)) {
+                        renderAdminDashboard(container, user);
+                    } else {
+                        renderAdminLogin(container);
+                    }
+                });
+            }
+        };
+
+        const renderAdminLogin = (container) => {
+            container.innerHTML = `
+                <div class="container mx-auto px-4 max-w-md">
+                    <div class="bg-white p-8 rounded-2xl shadow-lg text-center">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-4">Admin Login</h1>
+                        <p class="text-gray-600 mb-6">Please sign in with an authorized Google account to access the dashboard.</p>
+                        <button id="admin-google-login-btn" class="bg-white text-gray-700 font-semibold px-6 py-3 rounded-full w-full border border-gray-300 hover:bg-gray-50 flex items-center justify-center gap-3">
+                            <img src="https://www.google.com/favicon.ico" alt="Google icon" class="w-5 h-5" />
+                            Sign in with Google
+                        </button>
+                    </div>
+                </div>
+            `;
+            container.querySelector('#admin-google-login-btn').addEventListener('click', async () => {
+                const provider = new GoogleAuthProvider();
+                try {
+                    const result = await signInWithPopup(auth, provider);
+                    if (!ALLOWED_ADMIN_EMAILS.includes(result.user.email)) {
+                        await signOut(auth);
+                        showModal('Access Denied. This Google account is not authorized.');
+                    }
+                    // onAuthStateChanged will handle rendering the dashboard on success
+                } catch (error) {
+                    showModal('Login Failed: ' + error.message);
+                }
+            });
+        };
+        
+        const renderAdminDashboard = (container, user) => {
+            container.innerHTML = `
+                <div class="container mx-auto px-4">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-12 gap-4">
+                        <h1 class="text-4xl font-bold text-gray-800">Admin Dashboard</h1>
+                        <div class="flex items-center gap-4">
+                            <span class="text-sm text-gray-600">Welcome, ${user.displayName || user.email}</span>
+                            <button id="admin-logout-btn" class="bg-red-500 text-white font-semibold px-6 py-2 rounded-lg hover:bg-red-600">Sign Out</button>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-2xl shadow-lg mb-12">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Manage Donations</h2>
+                        <div id="admin-donors-list" class="max-h-96 overflow-y-auto"></div>
+                    </div>
+                </div>
+            `;
+            container.querySelector('#admin-logout-btn').addEventListener('click', () => signOut(auth));
+            loadAdminData();
+        };
+        
+        const loadAdminData = () => {
+            const container = mainContent.querySelector('#admin-donors-list');
+            if (!container) return;
+            container.innerHTML = `<p class="text-center text-gray-500">Loading donations...</p>`;
+            
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            const donationsCollectionPath = `/artifacts/${appId}/public/data/donations`;
+            const q = query(collection(db, donationsCollectionPath));
+            onSnapshot(q, (snapshot) => {
+                if (snapshot.empty) {
+                    container.innerHTML = `<p class="text-center text-gray-500">No donations yet.</p>`;
+                    return;
+                }
+                const sortedDocs = snapshot.docs.sort((a, b) => b.data().timestamp - a.data().timestamp);
+                container.innerHTML = `<table class="w-full text-left">
+                    <thead>
+                        <tr class="border-b">
+                            <th class="p-2">Name</th><th class="p-2">Email</th><th class="p-2">Amount</th><th class="p-2">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    ${sortedDocs.map(doc => {
+                        const donor = doc.data();
+                        const date = donor.timestamp ? new Date(donor.timestamp.toDate()).toLocaleDateString() : 'N/A';
+                        return `
+                        <tr class="border-b border-gray-100 text-sm">
+                            <td class="p-2">${donor.name}</td>
+                            <td class="p-2">${donor.email}</td>
+                            <td class="p-2">₹${donor.amount}</td>
+                            <td class="p-2">${date}</td>
+                        </tr>`;
+                    }).join('')}
+                    </tbody>
+                </table>`;
+            });
+        };
+
+        // --- Event Handlers ---
+        const handleNavClick = (e) => {
+            e.preventDefault();
+            const page = e.currentTarget.dataset.page;
+            navigateTo(page);
+        };
+
+        const handleDonationSubmit = (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const button = form.querySelector('button[type="submit"]');
+            const name = form.name.value;
+            const email = form.email.value;
+            const phone = form.phone.value;
+            const location = form.location.value;
+            const amount = form.amount.value;
+            const note = form.note.value;
+
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+
+            const options = {
+                "key": "rzp_test_1234567890ABCD", // Replace with your actual Razorpay Key ID
+                "amount": amount * 100,
+                "currency": "INR",
+                "name": "ShareTheJoy",
+                "description": "Donation for a Cause",
+                "image": "https://placehold.co/100x100/3b82f6/FFFFFF?text=SJ",
+                "handler": async (response) => {
+                    try {
+                        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                        const donationsCollectionPath = `/artifacts/${appId}/public/data/donations`;
+                        await addDoc(collection(db, donationsCollectionPath), {
+                            name, email, phone, location,
+                            amount: Number(amount), note,
+                            paymentId: response.razorpay_payment_id,
+                            timestamp: new Date()
+                        });
+                        showModal('Thank you for your generous donation!');
+                        form.reset();
+                    } catch (error) {
+                        console.error("Error adding document: ", error);
+                        showModal('There was an error saving your donation.');
+                    } finally {
+                        button.disabled = false;
+                        button.textContent = 'Proceed to Pay';
+                    }
+                },
+                "prefill": { name, email, contact: phone },
+                "theme": { "color": "#3B82F6" },
+                "modal": {
+                    "ondismiss": function() {
+                        button.disabled = false;
+                        button.textContent = 'Proceed to Pay';
+                    }
+                }
+            };
+            const rzp1 = new window.Razorpay(options);
+            rzp1.on('payment.failed', (response) => {
+                showModal("Payment Failed: " + response.error.description);
+                button.disabled = false;
+                button.textContent = 'Proceed to Pay';
+            });
+            rzp1.open();
+        };
+
+        // --- Router ---
+        const navigateTo = (page) => {
+            window.scrollTo(0, 0);
+            if (pages[page]) {
+                pages[page]();
+            } else {
+                pages.home(); // Default to home
+            }
+        };
+
+        // --- App Initialization ---
+        const initApp = async () => {
+            // Setup mobile menu
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+            
+            // Attach nav link listeners
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    handleNavClick(e);
+                    mobileMenu.classList.add('hidden'); // Close menu on navigation
+                });
+            });
+
+            // Firebase setup
+            const firebaseConfig = {
+                apiKey: "AIzaSyAjYZKpRhp_4SyJuAP5nHzrUkgnsdjg2sc",
+                authDomain: "sharethejoy-donations.firebaseapp.com",
+                projectId: "sharethejoy-donations",
+                storageBucket: "sharethejoy-donations.appspot.com",
+                messagingSenderId: "791267759945",
+                appId: "1:791267759945:web:b769b5ba8c30bdec9fac98",
+                measurementId: "G-P1RZ0CNDPC"
+            };
+            
+            const app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            setLogLevel('debug');
+            
+            try {
+                if (auth.currentUser === null) {
+                    await signInAnonymously(auth);
+                }
+                console.log("Firebase base authentication successful.");
+                navigateTo('home');
+            } catch (error) {
+                console.error("Firebase authentication failed:", error);
+                showModal("Could not connect to the service. Please try again later.");
+                mainContent.innerHTML = `<div class="text-center py-20"><p>Application failed to start.</p></div>`;
+            }
+        };
+
+        // --- Start the App ---
+        document.addEventListener('DOMContentLoaded', initApp);
+
+    </script>
+</body>
+</html>
